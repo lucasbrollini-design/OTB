@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skillvue × OTB Diesel — Assessment Framework</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --primary:#6769FF;--primary-hover:#5557DD;--primary-light:#EDEDFF;
+    --text:#1A1A1A;--secondary:#374151;--muted:#6B7280;
+    --border:#E5E7EB;--surface:#F9FAFB;--card:#FFFFFF;
+    --info-bg:#EFF6FF;--info-text:#1D4ED8;
+    --success-bg:#F0FDF4;--success-text:#15803D;--success-deep-bg:#DCFCE7;--success-deep-text:#166534;
+    --warning-bg:#FFFBEB;--warning-text:#B45309;
+    --danger-bg:#FEF2F2;--danger-text:#B91C1C;
+    --neutral-100:#F3F4F6;--neutral-200:#E5E7EB;--neutral-300:#D1D5DB;
+    --neutral-400:#9CA3AF;--neutral-500:#6B7280;--neutral-700:#374151;--neutral-900:#111827;
+    --gradient:linear-gradient(135deg,#FFB74B 0%,#FF6550 48.7%,#6769FF 100%);
+    --shadow-sm:0 1px 3px rgba(0,0,0,.08);--shadow-md:0 4px 12px rgba(0,0,0,.10);--shadow-lg:0 8px 24px rgba(0,0,0,.12);
+    --radius-sm:4px;--radius-md:8px;--radius-lg:12px;--radius-full:9999px;
+  }
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--surface);color:var(--text);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+
+  /* SIDEBAR */
+  .sidebar{position:fixed;left:0;top:0;bottom:0;width:239px;background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;transition:width 200ms}
+  .sidebar-logo{padding:16px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);min-height:56px}
+  .sidebar-logo svg{flex-shrink:0}
+  .sidebar-nav{flex:1;padding:12px 8px;overflow-y:auto}
+  .nav-section-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:16px 16px 6px}
+  .nav-item{display:flex;align-items:center;gap:10px;height:40px;padding:0 16px;border-radius:var(--radius-md);font-size:14px;font-weight:500;color:var(--secondary);cursor:pointer;transition:all 150ms;text-decoration:none;position:relative}
+  .nav-item:hover{background:var(--surface)}
+  .nav-item.active{background:var(--primary-light);color:var(--primary);border-left:2px solid var(--primary)}
+  .nav-item.active svg{color:var(--primary)}
+  .nav-item svg{width:20px;height:20px;color:var(--neutral-400);flex-shrink:0}
+
+  /* TOPBAR */
+  .topbar{position:fixed;top:0;left:239px;right:0;height:56px;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:90}
+  .topbar-left{display:flex;align-items:center;gap:12px}
+  .topbar-left h1{font-size:16px;font-weight:600;color:var(--text)}
+  .topbar-right{display:flex;align-items:center;gap:12px}
+  .avatar{width:32px;height:32px;border-radius:50%;background:var(--primary-light);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600}
+
+  /* CONTENT */
+  .content{margin-left:239px;margin-top:56px;padding:24px;max-width:1280px}
+
+  /* CARDS */
+  .card{background:var(--card);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);padding:24px}
+  .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+  .card-title{font-size:14px;font-weight:600;color:var(--text)}
+  .card-subtitle{font-size:12px;color:var(--muted);margin-top:2px}
+
+  /* HERO */
+  .hero{background:var(--card);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);padding:32px;display:flex;align-items:center;justify-content:space-between;gap:32px;margin-bottom:24px;position:relative;overflow:hidden}
+  .hero::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:var(--gradient)}
+  .hero-content{flex:1}
+  .hero-content h2{font-size:24px;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:4px}
+  .hero-content p{font-size:14px;color:var(--muted);max-width:560px}
+  .hero-badges{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+  .hero-right{display:flex;gap:16px;align-items:center}
+  .hero-stat{text-align:center;padding:16px 20px;background:var(--surface);border-radius:var(--radius-md)}
+  .hero-stat-value{font-size:32px;font-weight:700;background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .hero-stat-label{font-size:12px;color:var(--muted);font-weight:500;margin-top:2px}
+
+  /* TAGS */
+  .tag{display:inline-flex;align-items:center;height:24px;padding:0 8px;border-radius:var(--radius-full);font-size:12px;font-weight:500;white-space:nowrap}
+  .tag-neutral{background:var(--neutral-100);color:var(--secondary)}
+  .tag-accent{background:var(--primary-light);color:var(--primary-hover)}
+  .tag-info{background:var(--info-bg);color:var(--info-text)}
+  .tag-success{background:var(--success-bg);color:var(--success-text)}
+  .tag-warning{background:var(--warning-bg);color:var(--warning-text)}
+  .tag-danger{background:var(--danger-bg);color:var(--danger-text)}
+  .tag-outline{background:transparent;border:1px solid currentColor}
+
+  /* LIKERT TAGS */
+  .likert{display:inline-flex;align-items:center;justify-content:center;height:24px;border-radius:var(--radius-full);font-size:12px;font-weight:500;width:68px}
+  .likert-core{background:var(--danger-bg);color:var(--danger-text)}
+  .likert-alta{background:var(--warning-bg);color:var(--warning-text)}
+
+  /* RELEVANCE INDICATOR */
+  .relevance{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:500}
+  .relevance-dot{width:8px;height:8px;border-radius:50%}
+  .relevance-core .relevance-dot{background:#DC2626}
+  .relevance-core{color:var(--danger-text)}
+  .relevance-alta .relevance-dot{background:#F59E0B}
+  .relevance-alta{color:var(--warning-text)}
+
+  /* GRID */
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px}
+  .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+
+  /* VALUES */
+  .value-card{padding:20px;border-radius:var(--radius-md);border:1px solid var(--border);background:var(--card);transition:all 200ms;cursor:default;position:relative;overflow:hidden}
+  .value-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
+  .value-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+  .value-courage::before{background:#FF6550}
+  .value-respect::before{background:#FFB74B}
+  .value-excellence::before{background:#6769FF}
+  .value-evolution::before{background:var(--gradient)}
+  .value-card h4{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+  .value-card .value-motto{font-size:12px;font-weight:500;color:var(--primary);margin-bottom:8px}
+  .value-card p{font-size:12px;color:var(--muted);line-height:1.5}
+
+  /* TABS */
+  .tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:24px;gap:0}
+  .tab{height:41px;padding:0 20px;display:flex;align-items:center;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 150ms;white-space:nowrap}
+  .tab:hover{color:var(--secondary)}
+  .tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+
+  /* TABLE */
+  .table-wrap{overflow-x:auto}
+  table{width:100%;border-collapse:collapse}
+  thead th{background:var(--neutral-100);height:40px;padding:0 16px;font-size:12px;font-weight:600;color:var(--neutral-700);text-align:left;white-space:nowrap;border-bottom:1px solid var(--neutral-200)}
+  tbody td{height:auto;padding:12px 16px;font-size:14px;color:var(--neutral-700);border-bottom:1px solid var(--neutral-200);vertical-align:top}
+  tbody tr:hover{background:var(--surface)}
+  tbody tr:last-child td{border-bottom:none}
+
+  /* SKILL ROW */
+  .skill-name{font-weight:600;color:var(--text);font-size:14px;white-space:nowrap}
+  .skill-desc{font-size:12px;color:var(--muted);margin-top:2px;max-width:320px;line-height:1.5}
+  .skill-source{font-size:12px;color:var(--muted);line-height:1.5;max-width:240px}
+  .skill-source em{font-style:italic;color:var(--neutral-500)}
+
+  /* KEY COMPETENCES TABLE */
+  .kc-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--neutral-200)}
+  .kc-row:last-child{border-bottom:none}
+  .kc-num{width:28px;height:28px;border-radius:50%;background:var(--primary-light);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+  .kc-info{flex:1}
+  .kc-name{font-size:14px;font-weight:600;color:var(--text)}
+  .kc-desc{font-size:12px;color:var(--muted);margin-top:2px}
+  .kc-rel{flex-shrink:0}
+
+  /* WORKSHOP QUESTIONS */
+  .question-item{display:flex;gap:12px;padding:16px;border:1px solid var(--border);border-radius:var(--radius-md);margin-bottom:12px;transition:all 150ms}
+  .question-item:hover{border-color:var(--primary);background:var(--primary-light)}
+  .question-icon{width:32px;height:32px;border-radius:50%;background:var(--warning-bg);color:var(--warning-text);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .question-text{font-size:14px;color:var(--secondary);line-height:1.5}
+
+  /* COMPARISON VIZ */
+  .comparison-header{display:grid;grid-template-columns:180px 1fr 1fr;gap:0;margin-bottom:0}
+  .comparison-header span{font-size:12px;font-weight:600;color:var(--neutral-700);padding:10px 16px;background:var(--neutral-100);border-bottom:1px solid var(--neutral-200)}
+  .comparison-header span:first-child{border-radius:var(--radius-md) 0 0 0}
+  .comparison-header span:last-child{border-radius:0 var(--radius-md) 0 0}
+  .comparison-row{display:grid;grid-template-columns:180px 1fr 1fr;gap:0;border-bottom:1px solid var(--neutral-200)}
+  .comparison-row:last-child{border-bottom:none}
+  .comparison-row>div{padding:10px 16px;font-size:13px}
+  .comparison-row .comp-skill{font-weight:600;color:var(--text);display:flex;align-items:center;gap:6px}
+  .comparison-row .comp-cell{color:var(--secondary)}
+  .check-icon{width:16px;height:16px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+  .check-yes{background:var(--success-bg);color:var(--success-text)}
+  .check-no{background:var(--neutral-100);color:var(--neutral-400)}
+
+  /* SECTION SPACING */
+  .section{margin-bottom:32px}
+  .section-title{font-size:20px;font-weight:700;color:var(--text);margin-bottom:4px}
+  .section-sub{font-size:14px;color:var(--muted);margin-bottom:20px}
+
+  /* BADGE COUNT */
+  .badge-count{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:var(--radius-full);background:var(--primary);color:white;font-size:11px;font-weight:600}
+
+  /* BUTTON */
+  .btn{height:36px;padding:0 16px;border-radius:var(--radius-md);font-size:14px;font-weight:600;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all 150ms;font-family:inherit}
+  .btn-solid{background:var(--primary);color:white}
+  .btn-solid:hover{background:var(--primary-hover)}
+  .btn-ghost{background:transparent;color:var(--primary)}
+  .btn-ghost:hover{background:var(--primary-light)}
+  .btn-outline{background:white;color:var(--primary);border:1.5px solid var(--primary)}
+  .btn-outline:hover{background:var(--primary-light)}
+
+  /* CROSS LINKS */
+  .cross-links{display:flex;gap:8px;flex-wrap:wrap;margin-top:24px;padding-top:20px;border-top:1px solid var(--border)}
+  .cross-link{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--radius-md);font-size:13px;font-weight:500;color:var(--primary);background:var(--primary-light);cursor:pointer;transition:all 150ms;border:none;font-family:inherit}
+  .cross-link:hover{background:var(--primary);color:white;box-shadow:var(--shadow-sm)}
+  .cross-link svg{width:14px;height:14px}
+
+  /* PROGRESS BAR */
+  .progress-bar{height:6px;background:var(--neutral-100);border-radius:var(--radius-full);overflow:hidden}
+  .progress-fill{height:100%;border-radius:var(--radius-full);transition:width 600ms ease}
+
+  /* DIESEL LOGO BADGE */
+  .diesel-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;background:#ED1C24;border-radius:var(--radius-md);color:white;font-size:13px;font-weight:700;letter-spacing:.05em}
+
+  /* ANIMATION */
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  .animate{animation:fadeUp .4s ease both}
+  .delay-1{animation-delay:.1s}
+  .delay-2{animation-delay:.2s}
+  .delay-3{animation-delay:.3s}
+  .delay-4{animation-delay:.4s}
+
+  /* RESPONSIVE */
+  @media(max-width:1024px){
+    .sidebar{display:none}
+    .topbar{left:0}
+    .content{margin-left:0}
+    .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
+    .hero{flex-direction:column}
+    .hero-right{flex-wrap:wrap;justify-content:center}
+    .comparison-header,.comparison-row{grid-template-columns:120px 1fr 1fr}
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="120" height="22" viewBox="0 0 159 29" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M155.533 10.0007C155.533 10.1723 155.533 10.3438 155.519 10.5154V10.5425C155.491 11.1565 155.399 11.7615 155.25 12.344C155.045 13.1747 154.734 13.9648 154.325 14.7008C154.158 15.0078 153.698 14.9762 153.553 14.6556V14.6466C153.512 14.5473 153.465 14.4434 153.414 14.3396C153.379 14.269 153.342 14.201 153.304 14.1317L153.265 14.0597C153.265 14.0544 153.262 14.0506 153.259 14.0475C153.258 14.0453 153.256 14.0435 153.256 14.0416L153.256 14.0415C153.2 13.9422 153.144 13.8429 153.084 13.7481C153.078 13.7347 153.07 13.7213 153.061 13.7088L153.061 13.7088C153.056 13.7003 153.051 13.6922 153.047 13.6849L153.046 13.6835C153.014 13.6343 152.981 13.5851 152.945 13.5314C152.903 13.4682 152.861 13.4095 152.814 13.3463C152.642 13.107 152.457 12.8812 152.257 12.669C152.192 12.5968 152.122 12.5291 152.052 12.4659C152.046 12.4598 152.04 12.4533 152.034 12.4468L152.034 12.4468C152.021 12.4337 152.009 12.4207 151.996 12.4117C151.722 12.1453 151.429 11.9015 151.118 11.6848C150.974 11.5854 150.909 11.4139 150.946 11.2468C151.002 11.0166 151.044 10.7773 151.067 10.538C151.076 10.4567 151.081 10.3709 151.086 10.2851C151.086 10.2355 151.088 10.1869 151.09 10.1384C151.092 10.0899 151.095 10.0413 151.095 9.99165C151.095 9.47694 151.025 8.97578 150.89 8.50622L150.882 8.477C150.866 8.42254 150.85 8.36633 150.83 8.31659C150.546 7.43617 150.049 6.64605 149.394 6.00944C149.199 5.81529 148.985 5.6347 148.762 5.47216L148.752 5.46313C148.529 5.30059 148.297 5.15159 148.046 5.02517C147.688 4.83554 147.316 4.68204 146.921 4.56916C146.782 4.52401 146.647 4.49241 146.508 4.46532C146.108 4.37953 145.694 4.33438 145.271 4.33438C144.848 4.33438 144.435 4.37953 144.035 4.46532C143.896 4.49241 143.756 4.52853 143.621 4.56916C143.217 4.68655 142.827 4.84457 142.464 5.03872C142.39 5.07478 142.32 5.11535 142.251 5.15592L142.25 5.15611C141.851 5.3954 141.479 5.67985 141.149 6.00041C140.968 6.17649 140.796 6.36612 140.642 6.5693C140.238 7.084 139.922 7.67095 139.717 8.30756C139.694 8.37077 139.676 8.43398 139.657 8.49719C139.522 8.96675 139.452 9.46791 139.452 9.98262C139.452 10.082 139.452 10.1768 139.462 10.2761V10.2764C139.462 10.3214 139.462 10.3665 139.471 10.4115V10.4386V10.4928V10.5335V10.5425C139.476 10.5588 139.478 10.5763 139.481 10.5944C139.483 10.6113 139.485 10.6288 139.49 10.6463C139.49 10.6689 139.49 10.6915 139.499 10.7186V10.7186C139.499 10.7276 139.499 10.7366 139.508 10.7457C139.515 10.7807 139.526 10.8181 139.537 10.8545C139.541 10.8696 139.546 10.8846 139.55 10.8992C139.559 10.9488 139.578 10.9985 139.601 11.0482C139.638 11.1382 139.685 11.2242 139.731 11.3055C139.731 11.3145 139.741 11.3281 139.755 11.3371L139.775 11.3675C139.795 11.3963 139.813 11.4231 139.834 11.45C139.861 11.4906 139.894 11.5313 139.931 11.5674L139.931 11.5674C139.95 11.59 139.968 11.6125 139.987 11.6261C139.993 11.6321 139.999 11.6381 140.005 11.6441C140.016 11.6562 140.027 11.6682 140.043 11.6803C140.117 11.757 140.196 11.8202 140.284 11.8744C140.368 11.9286 140.456 11.9782 140.549 12.0234C140.554 12.0234 140.559 12.0257 140.563 12.0279C140.568 12.0302 140.573 12.0324 140.577 12.0324C140.619 12.055 140.661 12.0685 140.703 12.0821L140.703 12.0821C140.898 12.1543 141.116 12.195 141.339 12.195H146.958C148.148 12.195 149.213 12.5607 150.072 13.1702C151.411 14.1138 152.247 15.6444 152.271 17.2788C152.285 18.0193 152.131 18.7823 151.773 19.5228C151.341 20.4348 150.649 21.1798 149.812 21.699C148.975 22.2182 147.99 22.5072 146.958 22.5072H140.573C140.345 22.5072 140.14 22.3808 140.038 22.1821L138.435 19.0171C138.239 18.6333 138.528 18.1818 138.969 18.1818H147.042C147.307 18.1818 147.628 18.0012 147.762 17.7845C148.134 17.2382 147.735 16.5113 147.056 16.5113H140.758C140.447 16.5113 140.14 16.4842 139.843 16.439C137.775 16.1095 136.032 14.6917 135.404 12.7413C135.344 12.5607 135.297 12.3756 135.256 12.1904C135.088 11.4816 135 10.7411 135 9.97811C135 9.64851 135.014 9.32795 135.046 9.0119C135.056 8.88548 135.074 8.76358 135.093 8.64167C135.107 8.52428 135.125 8.40689 135.149 8.28951C135.167 8.18114 135.191 8.06827 135.214 7.95991C135.218 7.94162 135.221 7.92423 135.224 7.90736C135.228 7.88675 135.232 7.86689 135.237 7.84704C135.265 7.72073 135.297 7.59894 135.33 7.47715L135.33 7.47681C135.363 7.34136 135.404 7.21042 135.446 7.07949C135.476 6.98212 135.509 6.88764 135.542 6.79143L135.542 6.79142L135.567 6.71829C135.567 6.70549 135.572 6.69496 135.576 6.68508C135.578 6.68103 135.58 6.67708 135.581 6.67314C135.596 6.63258 135.611 6.59201 135.626 6.55145L135.626 6.55143L135.626 6.55142C135.656 6.47009 135.686 6.38876 135.72 6.30743C135.767 6.19004 135.813 6.08168 135.864 5.97332C135.874 5.94623 135.888 5.91463 135.902 5.88754C135.948 5.77929 136.004 5.67555 136.06 5.57181L136.06 5.57149V5.56246C136.181 5.32316 136.315 5.08838 136.455 4.85812C136.594 4.62786 136.748 4.40211 136.906 4.1899C136.906 4.1899 136.906 4.1899 136.908 4.1879C136.909 4.1866 136.911 4.18444 136.915 4.18087C137.152 3.85579 137.412 3.54877 137.691 3.25079C137.784 3.15146 137.877 3.05664 137.975 2.96183C138.133 2.80832 138.295 2.65932 138.463 2.51484C138.713 2.29813 138.974 2.09495 139.248 1.90081C139.329 1.84361 139.413 1.78642 139.498 1.72922C139.54 1.70063 139.583 1.67204 139.624 1.64345C139.755 1.56218 139.885 1.48091 140.019 1.40416C140.15 1.3274 140.284 1.25065 140.419 1.18292C140.689 1.04296 140.972 0.912026 141.256 0.794637L141.256 0.794606C141.4 0.735922 141.544 0.677239 141.688 0.627582C141.981 0.523738 142.283 0.428923 142.585 0.352169C142.648 0.33696 142.709 0.320328 142.769 0.303872L142.769 0.303869C142.817 0.291013 142.863 0.278264 142.91 0.266384C143.022 0.239294 143.129 0.216719 143.24 0.194144H143.25C143.561 0.13545 143.882 0.0857848 144.207 0.0541799C144.351 0.040635 144.495 0.02709 144.639 0.022575C144.848 0.00903005 145.062 0 145.271 0C145.443 0 145.615 0 145.787 0.013545C145.834 0.013545 145.876 0.013545 145.927 0.022575C145.968 0.0255192 146.008 0.0279834 146.048 0.0304371C146.131 0.0355091 146.214 0.0405362 146.298 0.0496648C146.318 0.0496648 146.336 0.0520755 146.353 0.0544057C146.369 0.0565854 146.385 0.0586948 146.401 0.0586948C146.531 0.0677248 146.661 0.0857846 146.786 0.103845C146.94 0.126419 147.089 0.148994 147.237 0.180599C147.307 0.189629 147.381 0.207689 147.451 0.225749C147.618 0.257354 147.786 0.297989 147.953 0.343139C148.078 0.370228 148.204 0.406348 148.329 0.446983C148.474 0.492133 148.618 0.537283 148.762 0.586948C149.059 0.690792 149.352 0.808182 149.635 0.939116C149.705 0.970721 149.775 1.00233 149.845 1.03845C149.871 1.05141 149.898 1.06399 149.925 1.07653C149.991 1.10767 150.056 1.13849 150.119 1.1739C150.147 1.18893 150.175 1.20397 150.203 1.21901C150.26 1.24912 150.317 1.27923 150.37 1.30934C150.376 1.30934 150.382 1.31336 150.388 1.31737C150.391 1.31938 150.395 1.32138 150.398 1.32289L150.649 1.47188C150.788 1.55315 150.932 1.64345 151.072 1.73827C151.137 1.7789 151.197 1.81954 151.262 1.8692C151.299 1.89622 151.336 1.92274 151.373 1.94926L151.374 1.9494L151.374 1.94942C151.448 2.00261 151.522 2.0558 151.597 2.11301L151.597 2.11313C151.629 2.13567 151.662 2.15822 151.699 2.18977L151.89 2.34328C151.969 2.40648 152.043 2.46969 152.117 2.53742C152.192 2.60063 152.261 2.66384 152.331 2.72705C152.484 2.86701 152.633 3.01149 152.773 3.16049C152.799 3.18982 152.827 3.21915 152.855 3.24879C152.897 3.29213 152.938 3.33613 152.977 3.38172C153.047 3.45396 153.112 3.53071 153.172 3.60295C153.214 3.64699 153.247 3.69102 153.284 3.73821L153.298 3.75646C153.328 3.78959 153.359 3.82758 153.388 3.86329L153.388 3.86332L153.419 3.90094C153.446 3.93496 153.471 3.96898 153.496 4.00212L153.496 4.00218L153.496 4.00229C153.514 4.02627 153.531 4.04979 153.549 4.07251C153.614 4.15378 153.67 4.23054 153.725 4.31181C153.809 4.4292 153.888 4.54207 153.962 4.65946C153.981 4.68203 153.995 4.70461 154.009 4.7317C154.093 4.85359 154.167 4.9845 154.241 5.11541L154.241 5.11547V5.1245C154.325 5.26898 154.399 5.40895 154.474 5.55794C154.553 5.71145 154.622 5.86044 154.687 6.01395C154.739 6.13134 154.79 6.24873 154.841 6.37064L154.883 6.479C154.929 6.59187 154.966 6.70023 155.003 6.81762C155.05 6.9305 155.082 7.03886 155.115 7.15624C155.148 7.25557 155.18 7.35942 155.203 7.46326C155.245 7.61226 155.282 7.75674 155.31 7.91025L155.319 7.94955C155.348 8.08928 155.377 8.22588 155.399 8.36626C155.487 8.89 155.533 9.42728 155.533 9.97811V10.0007ZM148.563 24.2454C148.885 24.2454 149.097 24.5863 148.956 24.8824C148.87 25.0641 148.784 25.2447 148.698 25.4253L148.697 25.4262C148.611 25.6064 148.526 25.7866 148.44 25.9679C147.876 27.1701 146.664 28 145.267 28C143.87 28 142.662 27.1701 142.093 25.9679L142.092 25.964L142.092 25.9638C141.92 25.6018 141.749 25.2399 141.578 24.8824C141.437 24.5863 141.648 24.2454 141.97 24.2454H148.563ZM147.6 8.59681C147.6 9.88547 146.555 10.9301 145.267 10.9301C143.978 10.9301 142.933 9.88547 142.933 8.59681C142.933 7.30814 143.978 6.26347 145.267 6.26347C146.555 6.26347 147.6 7.30814 147.6 8.59681Z" fill="url(#g1s)"/><path d="M13.5635 25.2451C13.8851 25.2453 14.0961 25.5868 13.9551 25.8828C13.7833 26.246 13.6113 26.6046 13.4395 26.9678C12.8753 28.1699 11.6637 29 10.2666 29C8.86954 29 7.66227 28.17 7.09375 26.9678C6.92195 26.6046 6.74993 26.2415 6.57812 25.8828C6.43714 25.5869 6.64819 25.2454 6.96973 25.2451H13.5635ZM10.2715 1C10.4434 1 10.6152 1.00014 10.7871 1.01367C10.8336 1.01367 10.8756 1.01343 10.9268 1.02246C11.0522 1.03148 11.1734 1.03626 11.2988 1.0498C11.3357 1.04987 11.3681 1.05854 11.4004 1.05859C11.5304 1.06761 11.6608 1.08547 11.7861 1.10352C11.9395 1.12609 12.0886 1.14906 12.2373 1.18066C12.307 1.1897 12.3815 1.20753 12.4512 1.22559C12.6185 1.25719 12.7858 1.29763 12.9531 1.34277C13.0785 1.36984 13.2037 1.40667 13.3291 1.44727C13.4732 1.49242 13.6176 1.53725 13.7617 1.58691C14.0592 1.69076 14.3522 1.80852 14.6357 1.93945C14.7053 1.971 14.7751 2.00204 14.8447 2.03809C14.9377 2.08324 15.0308 2.12416 15.1191 2.17383C15.2027 2.21894 15.2912 2.26446 15.3701 2.30957C15.3793 2.30979 15.3883 2.31878 15.3975 2.32324C15.481 2.37286 15.5649 2.42207 15.6484 2.47168C15.7878 2.55291 15.9319 2.64351 16.0713 2.73828C16.1363 2.77885 16.1968 2.81958 16.2617 2.86914C16.3733 2.95041 16.4851 3.0275 16.5967 3.11328C16.6292 3.13583 16.6621 3.15789 16.6992 3.18945L16.8896 3.34375C16.9685 3.40682 17.043 3.46954 17.1172 3.53711C17.1915 3.60024 17.2614 3.66343 17.3311 3.72656C17.4843 3.86645 17.6331 4.01125 17.7725 4.16016C17.8375 4.2324 17.9125 4.30508 17.9775 4.38184C18.047 4.45384 18.1116 4.53052 18.1719 4.60254C18.2184 4.6522 18.256 4.70266 18.2979 4.75684C18.3396 4.80194 18.3818 4.85629 18.4189 4.90137C18.4653 4.95988 18.5071 5.01825 18.5488 5.07227C18.6139 5.1535 18.6698 5.23029 18.7256 5.31152C18.8092 5.42891 18.8885 5.54179 18.9629 5.65918C18.9814 5.68167 18.9949 5.70449 19.0088 5.73145C19.0924 5.85329 19.1669 5.98437 19.2412 6.11523C19.2412 6.11523 19.2412 6.11832 19.2412 6.12402C19.3248 6.26842 19.3993 6.40872 19.4736 6.55762C19.5526 6.71105 19.6225 6.86024 19.6875 7.01367C19.7386 7.13106 19.7897 7.24919 19.8408 7.37109C19.8547 7.40696 19.869 7.44265 19.8828 7.47852C19.9293 7.59136 19.9667 7.70003 20.0039 7.81738C20.0504 7.93026 20.0827 8.03886 20.1152 8.15625C20.1477 8.25543 20.1799 8.3592 20.2031 8.46289C20.245 8.61188 20.2827 8.75666 20.3105 8.91016C20.3431 9.06365 20.3752 9.21272 20.3984 9.36621C20.4867 9.88995 20.5332 10.4277 20.5332 10.9785V11.001C20.5332 11.1724 20.5335 11.3442 20.5195 11.5156V11.542C20.4916 12.1559 20.3987 12.7614 20.25 13.3438C20.0455 14.1745 19.7342 14.9652 19.3252 15.7012C19.1578 16.008 18.6978 15.9758 18.5537 15.6553V15.6465C18.5119 15.5472 18.4651 15.4436 18.4141 15.3398C18.3676 15.2451 18.3167 15.1544 18.2656 15.0596C18.2656 15.0508 18.2564 15.0464 18.2559 15.042C18.2001 14.9427 18.1444 14.8429 18.084 14.748C18.0747 14.7255 18.0562 14.7026 18.0469 14.6846C18.0144 14.635 17.9815 14.5854 17.9443 14.5312C17.9026 14.4682 17.8608 14.4097 17.8145 14.3467C17.6425 14.1074 17.4567 13.8811 17.2568 13.6689C17.1918 13.5967 17.1215 13.529 17.0518 13.4658C17.0333 13.4478 17.0146 13.4256 16.9961 13.4121C16.7219 13.1457 16.4296 12.9013 16.1182 12.6846C15.9742 12.5853 15.9092 12.4141 15.9463 12.2471C16.0021 12.0168 16.0441 11.7774 16.0674 11.5381C16.0767 11.4568 16.0813 11.3709 16.0859 11.2852C16.0859 11.1858 16.0947 11.0905 16.0947 10.9912C16.0947 10.4767 16.0254 9.97528 15.8906 9.50586C15.8721 9.44272 15.8533 9.37502 15.8301 9.31641C15.5466 8.43605 15.0488 7.64634 14.3936 7.00977C14.1984 6.81562 13.9848 6.63422 13.7617 6.47168C13.7612 6.47114 13.7585 6.46929 13.752 6.46289C13.529 6.30048 13.2967 6.15173 13.0459 6.02539C12.688 5.83576 12.3159 5.68221 11.9209 5.56934C11.7816 5.52424 11.6471 5.49191 11.5078 5.46484C11.1082 5.37907 10.6944 5.334 10.2715 5.33398C9.84863 5.33398 9.43479 5.37909 9.03516 5.46484C8.89573 5.49193 8.75588 5.5287 8.62109 5.56934C8.21687 5.68672 7.82628 5.84497 7.46387 6.03906C7.38963 6.07514 7.31961 6.11568 7.25 6.15625C6.85042 6.3955 6.47833 6.67952 6.14844 7C5.96722 7.17604 5.79592 7.36622 5.64258 7.56934C5.23825 8.08403 4.92227 8.67103 4.71777 9.30762C4.69456 9.37076 4.6758 9.43392 4.65723 9.49707C4.52246 9.96657 4.45217 10.4678 4.45215 10.9824C4.45215 11.0818 4.45262 11.177 4.46191 11.2764C4.46191 11.3213 4.46152 11.3662 4.4707 11.4111V11.542C4.48 11.5736 4.47996 11.6104 4.48926 11.6465C4.48926 11.669 4.48975 11.6917 4.49902 11.7188C4.49902 11.7277 4.49858 11.7371 4.50781 11.7461C4.51713 11.7957 4.53589 11.8499 4.5498 11.8994C4.55911 11.949 4.57838 11.9983 4.60156 12.0479C4.63874 12.1382 4.68497 12.2244 4.73145 12.3057C4.73155 12.3147 4.74102 12.3279 4.75488 12.3369C4.78277 12.3775 4.8061 12.4141 4.83398 12.4502C4.86182 12.4907 4.89456 12.5314 4.93164 12.5674C4.95017 12.5899 4.96878 12.6125 4.9873 12.626C5.00583 12.644 5.01979 12.6626 5.04297 12.6807C5.11715 12.7572 5.19613 12.82 5.28418 12.874C5.36773 12.9281 5.45601 12.9783 5.54883 13.0234C5.55811 13.0234 5.56786 13.0322 5.57715 13.0322C5.61898 13.0548 5.6613 13.0685 5.70312 13.082C5.89823 13.1542 6.1169 13.1953 6.33984 13.1953H11.958C13.1477 13.1953 14.2125 13.5605 15.0723 14.1699C16.4108 15.1136 17.2473 16.6449 17.2705 18.2793C17.2844 19.0195 17.1311 19.7822 16.7734 20.5225C16.3412 21.4344 15.649 22.18 14.8125 22.6992C13.9759 23.2184 12.9898 23.5068 11.958 23.5068H5.57227C5.34465 23.5067 5.14029 23.3802 5.03809 23.1816L3.43457 20.0176C3.23942 19.6339 3.52743 19.1819 3.96875 19.1816H12.042C12.3069 19.1816 12.6279 19.0009 12.7627 18.7842C13.1341 18.2379 12.7341 17.5117 12.0557 17.5117H5.75879C5.4474 17.5117 5.14022 17.4846 4.84277 17.4395C2.77458 17.1099 1.03173 15.6917 0.404297 13.7412C0.343892 13.5606 0.297681 13.3755 0.255859 13.1904C0.0885739 12.4817 3.15036e-05 11.7414 0 10.9785C0 10.6489 0.0143415 10.3278 0.046875 10.0117C0.0561754 9.88537 0.0741931 9.76344 0.0927734 9.6416C0.106716 9.52423 0.125202 9.40644 0.148438 9.28906C0.167015 9.18083 0.190659 9.06818 0.213867 8.95996C0.223162 8.91933 0.228009 8.8828 0.237305 8.84668C0.265171 8.7204 0.297579 8.59834 0.330078 8.47656C0.362603 8.3412 0.404486 8.20996 0.446289 8.0791C0.48341 7.95744 0.525632 7.84042 0.567383 7.71875C0.567383 7.70069 0.576407 7.6864 0.581055 7.67285C0.62748 7.55106 0.66963 7.42941 0.720703 7.30762C0.76713 7.19035 0.813198 7.08188 0.864258 6.97363C0.873526 6.94662 0.887465 6.91473 0.901367 6.8877C0.947844 6.77934 1.0038 6.67513 1.05957 6.57129V6.5625C1.1804 6.32322 1.31566 6.08865 1.45508 5.8584C1.59451 5.62813 1.74725 5.40166 1.90527 5.18945C1.90559 5.18914 1.90769 5.18781 1.91504 5.18066C2.15202 4.85567 2.41261 4.54889 2.69141 4.25098C2.78433 4.15168 2.87704 4.0567 2.97461 3.96191C3.13263 3.80841 3.29558 3.65912 3.46289 3.51465C3.71377 3.29803 3.97395 3.09445 4.24805 2.90039C4.36871 2.81474 4.49872 2.72921 4.62402 2.64355C4.75415 2.56229 4.88476 2.48105 5.01953 2.4043C5.14965 2.32755 5.28418 2.25033 5.41895 2.18262C5.68851 2.04265 5.97235 1.91231 6.25586 1.79492C6.39976 1.7363 6.5436 1.67756 6.6875 1.62793C6.98027 1.5241 7.28289 1.42929 7.58496 1.35254C7.69644 1.32547 7.80332 1.29368 7.91016 1.2666C8.02167 1.23952 8.12873 1.2169 8.24023 1.19434H8.25C8.56127 1.13567 8.88183 1.0853 9.20703 1.05371C9.35108 1.04017 9.4956 1.02698 9.63965 1.02246C9.84866 1.00893 10.0625 1 10.2715 1ZM10.2666 7.26367C11.5552 7.26367 12.5995 8.30807 12.5996 9.59668C12.5996 10.8853 11.5553 11.9297 10.2666 11.9297C8.97797 11.9296 7.93359 10.8853 7.93359 9.59668C7.93366 8.3081 8.97802 7.26371 10.2666 7.26367Z" fill="url(#g2s)"/><path d="M85.0596 11.4985V18.228C85.0597 18.8546 85.2292 19.3526 85.5625 19.7163C85.896 20.0801 86.3541 20.2599 86.9307 20.2544H87.0381C87.6147 20.26 88.0727 20.0802 88.4062 19.7163C88.7397 19.3525 88.9091 18.8547 88.9092 18.228V11.4985H92.6631V18.2896H92.6582C92.658 21.1108 90.3453 23.3999 87.4961 23.3999H86.4678C83.6186 23.3999 81.3059 21.1108 81.3057 18.2896V11.4985H85.0596ZM99.2783 11.353C100.115 11.353 100.884 11.4815 101.585 11.7446C102.286 12.0077 102.891 12.3884 103.399 12.8921C103.908 13.3959 104.304 14.0175 104.581 14.7563C104.858 15.4953 104.999 16.3465 104.999 17.3149V18.2329H97.1387C97.1567 18.7055 97.2517 19.1202 97.4238 19.4761C97.616 19.8733 97.893 20.1755 98.249 20.3882C98.6051 20.6008 99.0122 20.7075 99.4756 20.7075C99.7977 20.7075 100.092 20.6623 100.363 20.5728C100.629 20.4832 100.861 20.3486 101.048 20.1694C101.234 19.9903 101.382 19.7777 101.483 19.5259L104.92 19.6216C104.779 20.3882 104.468 21.0541 103.993 21.6138C103.513 22.1792 102.891 22.6164 102.116 22.9243C101.342 23.2322 100.443 23.3882 99.4141 23.3882V23.3999C98.1761 23.3999 97.1129 23.1593 96.2197 22.6724C95.3265 22.1909 94.6419 21.4967 94.167 20.6011C93.6921 19.7055 93.4551 18.6305 93.4551 17.3823C93.4551 16.1341 93.6924 15.1261 94.1729 14.2192C94.6534 13.318 95.3266 12.6127 96.1973 12.1089C97.0679 11.6051 98.0968 11.353 99.2783 11.353ZM32.6904 7.41162C33.889 7.41162 34.9636 7.61332 35.8682 8.02197C36.7727 8.43062 37.4623 9.00156 37.9541 9.73486C38.446 10.4682 38.7006 11.3191 38.7119 12.2876H35.0596C35.02 11.7278 34.7938 11.2967 34.3867 10.9888C33.9797 10.6809 33.4087 10.5239 32.6738 10.5239C32.1821 10.5239 31.7695 10.5854 31.4473 10.7085C31.1194 10.8316 30.8757 11.0107 30.7061 11.229C30.5421 11.4529 30.458 11.7057 30.458 11.98C30.4581 12.2876 30.548 12.545 30.7344 12.7632C30.9153 12.9815 31.1817 13.1606 31.5322 13.3062C31.8827 13.4517 32.2897 13.5804 32.7588 13.6812L34.0986 13.9839C34.8731 14.1518 35.557 14.3756 36.1562 14.6499C36.7555 14.9298 37.2592 15.2595 37.6719 15.6401C38.0846 16.0208 38.3953 16.4635 38.6045 16.9673C38.8137 17.4711 38.9209 18.0312 38.9209 18.647C38.9209 19.6376 38.6722 20.4827 38.1748 21.188C37.6773 21.8933 36.9652 22.4369 36.0381 22.812C35.111 23.187 33.9914 23.3774 32.6855 23.3774L32.6904 23.3882C31.3735 23.3881 30.2318 23.192 29.2539 22.8003C28.276 22.4085 27.5124 21.8099 26.9697 21.0151C26.4271 20.2203 26.1442 19.2124 26.1328 18.0034H29.7627C29.7967 18.4958 29.9376 18.9157 30.1807 19.2515C30.4237 19.5873 30.7517 19.8445 31.1699 20.0181C31.5882 20.1916 32.0801 20.2817 32.6396 20.2817C33.1539 20.2817 33.5895 20.2145 33.9512 20.0747C34.313 19.9348 34.5902 19.7438 34.7881 19.4976C34.986 19.2512 35.082 18.9709 35.082 18.6519C35.0819 18.361 34.992 18.1091 34.8057 17.9077C34.6248 17.7006 34.347 17.5215 33.9795 17.3647C33.6121 17.2081 33.137 17.0677 32.5605 16.939L30.9043 16.564C29.5532 16.2561 28.4901 15.7581 27.71 15.064C26.9299 14.3698 26.54 13.4291 26.54 12.2368C26.5401 11.2741 26.8053 10.4342 27.3311 9.70654C27.8568 8.98443 28.5863 8.41917 29.5078 8.01611C30.4349 7.61311 31.4921 7.41167 32.6904 7.41162ZM43.998 15.6802H44.0039L47.3047 11.5034H51.5684L46.8555 17.2407L51.5684 23.1753H46.9375L44.0234 19.4458L43.998 19.4771V23.1753H40.2441V7.61279H43.998V15.6802ZM56.2207 23.1753H52.4668V11.4985H56.2207V23.1753ZM61.7559 23.1753H58.002V7.61279H61.7559V23.1753ZM67.2793 23.1753H63.5254V7.61279H67.2793V23.1753ZM74.29 19.5425H74.4141L76.585 11.4976H80.4912L76.4375 23.1753H72.1357L68.1162 11.4976H72.0732L74.29 19.5425ZM99.3232 14.0229C98.8542 14.023 98.453 14.1295 98.1309 14.3364C97.8087 14.5435 97.5593 14.8346 97.3896 15.2095C97.2714 15.4711 97.195 15.7631 97.1592 16.0884H101.439C101.404 15.7626 101.333 15.473 101.223 15.2212C101.059 14.8405 100.821 14.5491 100.505 14.3364C100.188 14.1294 99.7924 14.0229 99.3232 14.0229ZM54.3379 6.6001C54.8691 6.6001 55.3274 6.77353 55.7061 7.11475C56.0848 7.46179 56.2714 7.88195 56.2715 8.37451C56.2715 8.86714 56.0848 9.29306 55.7061 9.64014C55.3274 9.98696 54.8748 10.1606 54.3379 10.1606C53.8123 10.1605 53.3543 9.9871 52.9756 9.64014C52.5968 9.29306 52.4053 8.87273 52.4053 8.37451C52.4053 7.87636 52.5968 7.46179 52.9756 7.11475C53.3543 6.76779 53.8067 6.60019 54.3379 6.6001Z" fill="#1A1A1A"/><defs><linearGradient id="g1s" x1="147.95" y1="0.816667" x2="145.325" y2="27.8833" gradientUnits="userSpaceOnUse"><stop stop-color="#FFB74B"/><stop offset="0.487" stop-color="#FF6550"/><stop offset="1" stop-color="#6769FF"/></linearGradient><linearGradient id="g2s" x1="12.95" y1="1.81667" x2="10.325" y2="28.8833" gradientUnits="userSpaceOnUse"><stop stop-color="#FFB74B"/><stop offset="0.487" stop-color="#FF6550"/><stop offset="1" stop-color="#6769FF"/></linearGradient></defs></svg>
+  </div>
+
+  <div class="sidebar-nav">
+    <div class="nav-section-label">Assessment Design</div>
+    <a class="nav-item active" onclick="showSection('overview')">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+      Overview
+    </a>
+    <a class="nav-item" onclick="showSection('values')">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      Valori OTB
+    </a>
+    <a class="nav-item" onclick="showSection('competences')">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+      Key Competences
+    </a>
+    <a class="nav-item" onclick="showSection('clientadvisor')">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Client Advisor
+    </a>
+    <a class="nav-item" onclick="showSection('teamleader')">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
+      Team Leader
+    </a>
+    <a class="nav-item" onclick="showSection('comparison')">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
+      Confronto Ruoli
+    </a>
+
+  </div>
+</nav>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-left">
+    <div class="diesel-badge">
+      <span>DIESEL</span>
+    </div>
+    <h1>Assessment Framework</h1>
+  </div>
+  <div class="topbar-right">
+  </div>
+</header>
+
+<!-- CONTENT -->
+<main class="content">
+
+  <!-- OVERVIEW -->
+  <div id="section-overview">
+    <div class="hero animate">
+      <div class="hero-content">
+        <h2>Skillvue × OTB Diesel</h2>
+        <p>Framework Competenze per Assessment Design — Prima proposta basata su OTB HR Retail Book</p>
+        <div class="hero-badges">
+          <span class="tag tag-accent">Client Advisor</span>
+          <span class="tag tag-accent">Senior Client Advisor</span>
+          <span class="tag tag-accent">Team Leader</span>
+          <span class="tag tag-neutral">Diesel</span>
+          <span class="tag tag-neutral">Marni</span>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="hero-stat">
+          <div class="hero-stat-value">9</div>
+          <div class="hero-stat-label">Skill CA</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-value">12</div>
+          <div class="hero-stat-label">Skill TL</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-value">4</div>
+          <div class="hero-stat-label">Valori OTB</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FRAMEWORK STRUCTURE -->
+    <div class="section animate delay-1">
+      <div class="section-title">Struttura del Framework</div>
+      <div class="section-sub">Tre livelli integrati per il design degli assessment</div>
+      <div class="grid-3">
+        <div class="card" style="border-top:3px solid #FFB74B">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFB74B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            <span class="card-title">Valori OTB</span>
+          </div>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Fondamenta culturali trasversali a tutti i brand e ruoli del gruppo OTB.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <span class="tag tag-warning" style="font-size:11px">Courage</span>
+            <span class="tag tag-warning" style="font-size:11px">Respect</span>
+            <span class="tag tag-warning" style="font-size:11px">Excellence</span>
+            <span class="tag tag-warning" style="font-size:11px">Evolution</span>
+          </div>
+        </div>
+        <div class="card" style="border-top:3px solid #FF6550">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF6550" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+            <span class="card-title">Key Competences</span>
+          </div>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:12px">6 competenze chiave OTB dalla Retail Book, comuni a tutti i ruoli.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <span class="tag tag-danger" style="font-size:11px">Customer Centricity</span>
+            <span class="tag tag-danger" style="font-size:11px">Collaboration</span>
+            <span class="tag tag-danger" style="font-size:11px">Execution</span>
+            <span class="tag tag-neutral" style="font-size:11px">+3</span>
+          </div>
+        </div>
+        <div class="card" style="border-top:3px solid #6769FF">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6769FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span class="card-title">Competenze per Ruolo</span>
+          </div>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Skill specifiche mappate da JD e Requirements della Retail Book.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <span class="tag tag-accent" style="font-size:11px">CA: 9 skill</span>
+            <span class="tag tag-accent" style="font-size:11px">TL: 12 skill</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cross-links">
+      <button class="cross-link" onclick="navigateTo('values')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>Valori OTB</button>
+      <button class="cross-link" onclick="navigateTo('competences')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>Key Competences</button>
+      <button class="cross-link" onclick="navigateTo('clientadvisor')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>Client Advisor</button>
+      <button class="cross-link" onclick="navigateTo('teamleader')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>Team Leader</button>
+      <button class="cross-link" onclick="navigateTo('comparison')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>Confronto Ruoli</button>
+    </div>
+  </div>
+
+  <!-- VALUES -->
+  <div id="section-values" style="display:none">
+    <div class="section animate">
+      <div class="section-title">Valori OTB — Fondamenta Culturali</div>
+      <div class="section-sub">Layer motivazionale e di cultural fit per l'assessment</div>
+      <div class="grid-4">
+        <div class="value-card value-courage animate delay-1">
+          <h4 style="color:#FF6550">Courage</h4>
+          <div class="value-motto">Try different perspectives</div>
+          <p>Creatività, accountability, apertura mentale, disponibilità a sfidare il metodo consolidato</p>
+        </div>
+        <div class="value-card value-respect animate delay-2">
+          <h4 style="color:#FFB74B">Respect</h4>
+          <div class="value-motto">People first</div>
+          <p>Trasparenza, integrità, team spirit, valorizzazione delle opinioni altrui</p>
+        </div>
+        <div class="value-card value-excellence animate delay-3">
+          <h4 style="color:#6769FF">Excellence</h4>
+          <div class="value-motto">Raise the bar</div>
+          <p>Miglioramento continuo, passione per l'accuratezza, affidabilità</p>
+        </div>
+        <div class="value-card value-evolution animate delay-4">
+          <h4 style="background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Evolution</h4>
+          <div class="value-motto">Make things happen</div>
+          <p>Iniziativa, innovazione, velocità di consegna e azione</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="cross-links">
+      <button class="cross-link" onclick="navigateTo('overview')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>Overview</button>
+      <button class="cross-link" onclick="navigateTo('competences')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>Key Competences</button>
+    </div>
+  </div>
+
+  <!-- KEY COMPETENCES -->
+  <div id="section-competences" style="display:none">
+    <div class="section animate">
+      <div class="section-title">Key Competences OTB</div>
+      <div class="section-sub">6 competenze trasversali dalla Retail Book — modello comune a tutti i ruoli e brand</div>
+      <div class="card">
+        <div class="kc-row animate delay-1">
+          <div class="kc-num">1</div>
+          <div class="kc-info">
+            <div class="kc-name">Customer Centricity</div>
+            <div class="kc-desc">Mettere il cliente al centro di ogni decisione, creare la migliore esperienza possibile. "We are all customers."</div>
+          </div>
+          <div class="kc-rel"><span class="tag tag-danger">Alta</span></div>
+        </div>
+        <div class="kc-row animate delay-1">
+          <div class="kc-num">2</div>
+          <div class="kc-info">
+            <div class="kc-name">Entrepreneurship</div>
+            <div class="kc-desc">Leadership coraggiosa, agire con passione e ambizione, generare impatto positivo, fare la differenza.</div>
+          </div>
+          <div class="kc-rel"><span class="tag tag-warning">Alta — TL</span></div>
+        </div>
+        <div class="kc-row animate delay-2">
+          <div class="kc-num">3</div>
+          <div class="kc-info">
+            <div class="kc-name">Experimentation</div>
+            <div class="kc-desc">Vedere gli errori come parte del successo, imparare velocemente, non mollare, spingere verso l'innovazione.</div>
+          </div>
+          <div class="kc-rel"><span class="tag tag-neutral">Media</span></div>
+        </div>
+        <div class="kc-row animate delay-2">
+          <div class="kc-num">4</div>
+          <div class="kc-info">
+            <div class="kc-name">Collaboration</div>
+            <div class="kc-desc">Il lavoro di squadra porta risultati. Trovare valore nelle differenze, empowerment, co-progettazione.</div>
+          </div>
+          <div class="kc-rel"><span class="tag tag-danger">Alta</span></div>
+        </div>
+        <div class="kc-row animate delay-3">
+          <div class="kc-num">5</div>
+          <div class="kc-info">
+            <div class="kc-name">Critical Thinking</div>
+            <div class="kc-desc">Non smettere mai di sfidare. Essere curiosi e aperti, trovare opportunità, semplificare i problemi.</div>
+          </div>
+          <div class="kc-rel"><span class="tag tag-neutral">Media</span></div>
+        </div>
+        <div class="kc-row animate delay-3">
+          <div class="kc-num">6</div>
+          <div class="kc-info">
+            <div class="kc-name">Execution</div>
+            <div class="kc-desc">Ogni mente genera idee. Portarle a risultati concreti, azioni consistenti, business results.</div>
+          </div>
+          <div class="kc-rel"><span class="tag tag-danger">Alta</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cross-links">
+      <button class="cross-link" onclick="navigateTo('values')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>Valori OTB</button>
+      <button class="cross-link" onclick="navigateTo('clientadvisor')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>Client Advisor</button>
+      <button class="cross-link" onclick="navigateTo('teamleader')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>Team Leader</button>
+    </div>
+  </div>
+
+  <!-- CLIENT ADVISOR -->
+  <div id="section-clientadvisor" style="display:none">
+    <div class="section animate">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <div class="section-title">Client Advisor — 9 Skill</div>
+        <div style="display:flex;gap:8px">
+          <span class="tag tag-danger">Core: 5</span>
+          <span class="tag tag-warning">Alta: 4</span>
+        </div>
+      </div>
+      <div class="section-sub">Include Senior Client Advisor — Diesel, Marni e altri brand OTB</div>
+
+      <div class="card" style="padding:0;overflow:hidden">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:50px">#</th>
+                <th>Competenza OTB</th>
+                <th>Skill Skillvue</th>
+                <th style="width:90px">Rilevanza</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight:600;color:var(--muted)">1</td>
+                <td>
+                  <div class="skill-name">Customer Centricity</div>
+                  <div class="skill-desc">Agire e pensare prima al cliente e alla sua esperienza</div>
+                </td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:6px"><span class="tag tag-accent">Focusing on Others</span></div>
+                  <div class="skill-source" style="margin-top:4px">Understanding Others, Listening to Others, Caring for Others</div>
+                </td>
+                <td><span class="relevance relevance-core"><span class="relevance-dot"></span>Core</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:var(--muted)">2</td>
+                <td>
+                  <div class="skill-name">Relazione + Clienteling</div>
+                  <div class="skill-desc">Creare legami autentici e duraturi attraverso CRM</div>
+                </td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:6px"><span class="tag tag-accent">Building Relations</span></div>
+                  <div class="skill-source" style="margin-top:4px">Building Relationship, Developing Network</div>
+                </td>
+                <td><span class="relevance relevance-core"><span class="relevance-dot"></span>Core</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:var(--muted)">3</td>
+                <td>
+                  <div class="skill-name">Comunicazione + Storytelling</div>
+                  <div class="skill-desc">Master at storytelling and engaging questions</div>
+                </td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:6px"><span class="tag tag-accent">Presenting</span></div>
+                  <div class="skill-source" style="margin-top:4px">Speaking Fluently, Articulating Key Points, Projecting Credibility</div>
+                </td>
+                <td><span class="relevance relevance-core"><span class="relevance-dot"></span>Core</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:var(--muted)">4</td>
+                <td>
+                  <div class="skill-name">Orientamento al risultato</div>
+                  <div class="skill-desc">Responsabile per KPI e risultati di vendita</div>
+                </td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:6px"><span class="tag tag-accent">Delivering Result</span></div>
+                  <div class="skill-source" style="margin-top:4px">Focusing on Customers, Working Systematically, Maintaining Productivity</div>
+                </td>
+                <td><span class="relevance relevance-core"><span class="relevance-dot"></span>Core</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:var(--muted)">5</td>
+                <td>
+                  <div class="skill-name">Empatia + Gestione emozioni</div>
+                  <div class="skill-desc">Creare esperienze emotivamente arricchite</div>
+                </td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:6px"><span class="tag tag-accent">Emotional Intelligence</span></div>
+                  <div class="skill-source" style="margin-top:4px">Showing Empathy, Stabilizing Emotion, Managing Conflict</div>
+                </td>
+                <td><span class="relevance relevance-core"><span class="relevance-dot"></span>Core</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:var(--muted)">6</td>
+                <td>
+                  <div class="skill-name">Proattività + Iniziativa</div>
+                  <div class="skill-desc">Leadership attiva sul selling floor</div>
+                </td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:6px"><span class="tag tag-accent">Taking Action</span></div>
+                  <div class="skill-source" style="margin-top:4px">Acting on Own Initiative, Acting with Confidence</div>
+                </td>
+                <td><span class="relevance relevance-alta"><span class="relevance-dot"></span>Alta</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:var(--muted)">7</td>
+                <td>
+                  <div class="skill-name">Collaborazione</div>
+                  <div class="skill-desc">Co-progettare soluzioni, celebrare il successo</div>
+                </td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:6px"><span class="tag tag-accent">Teamwork</span></div>
+                  <div class="skill-source" style="margin-top:4px">Enhancing Team Spirit, Adapting to Team, Recognizing Contributions</div>
+                </td>
+                <td><span class="relevance relevance-alta"><span class="relevance-dot"></span>Alta</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:var(--muted)">8</td>
+                <td>
+                  <div class="skill-name">Sperimentazione + Apertura</div>
+                  <div class="skill-desc">Digitally aware, open to new ways of working</div>
+                </td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:6px"><span class="tag tag-accent">Learning Plasticity</span></div>
+                  <div class="skill-source" style="margin-top:4px">Accepting New Ideas, Learning Quickly, Thinking Quickly</div>
+                </td>
+                <td><span class="relevance relevance-alta"><span class="relevance-dot"></span>Alta</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:var(--muted)">9</td>
+                <td>
+                  <div class="skill-name">Resilienza + Pressione</div>
+                  <div class="skill-desc">Performance sotto pressione costante sui KPI</div>
+                </td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:6px"><span class="tag tag-accent">Resilience</span></div>
+                  <div class="skill-source" style="margin-top:4px">Coping with Pressure, Maintaining Positivity</div>
+                </td>
+                <td><span class="relevance relevance-alta"><span class="relevance-dot"></span>Alta</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- MOTIVATION -->
+      <div class="card" style="margin-top:20px">
+        <div class="card-title" style="margin-bottom:12px">Motivazione e Fit Culturale</div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <div style="flex:1;min-width:200px;padding:12px;background:var(--surface);border-radius:var(--radius-md)">
+            <div style="font-size:12px;font-weight:600;color:var(--primary);margin-bottom:4px">Passione</div>
+            <div style="font-size:13px;color:var(--secondary)">Retail e servizio al cliente</div>
+          </div>
+          <div style="flex:1;min-width:200px;padding:12px;background:var(--surface);border-radius:var(--radius-md)">
+            <div style="font-size:12px;font-weight:600;color:var(--primary);margin-bottom:4px">Interesse</div>
+            <div style="font-size:13px;color:var(--secondary)">Settore luxury/fashion</div>
+          </div>
+          <div style="flex:1;min-width:200px;padding:12px;background:var(--surface);border-radius:var(--radius-md)">
+            <div style="font-size:12px;font-weight:600;color:var(--primary);margin-bottom:4px">Orientamento</div>
+            <div style="font-size:13px;color:var(--secondary)">Crescita e evoluzione nell'organizzazione</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cross-links">
+      <button class="cross-link" onclick="navigateTo('competences')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>Key Competences</button>
+      <button class="cross-link" onclick="navigateTo('teamleader')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>Team Leader</button>
+      <button class="cross-link" onclick="navigateTo('comparison')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>Confronto Ruoli</button>
+    </div>
+  </div>
+
+  <!-- TEAM LEADER -->
+  <div id="section-teamleader" style="display:none">
+    <div class="section animate">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <div class="section-title">Team Leader — 12 Skill</div>
+        <div style="display:flex;gap:8px">
+          <span class="tag tag-danger">Core: 7</span>
+          <span class="tag tag-warning">Alta: 5</span>
+        </div>
+      </div>
+      <div class="section-sub">Diesel — Leadership, coaching e gestione del team in aggiunta alle competenze CA</div>
+
+      <div class="card" style="padding:0;overflow:hidden">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:50px">#</th>
+                <th>Competenza OTB</th>
+                <th>Skill Skillvue</th>
+                <th style="width:90px">Rilevanza</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight:600;color:var(--muted)">1</td>
+                <td>
+                  <div class="skill-name">Leadership del team</div>
+                  <div class="skill-desc">Coordinare il team, prendere decisioni operative</div>
+                </td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:6px"><span class="tag tag-accent">Leading</span></div>
+                  <div class="skill-source" style="margin-top:4px">Coordinating Action, Delegating, Making Decisions, Taking Responsibility</div>
+                </td>
+                <td><span class="relevance relevance-core"><span class="relevance-dot"></span>Core</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:var(--muted)">2</td>
+                <td>
+                  <div class="skill-name">Sviluppo e coaching</div>
+                  <div class="skill-desc">Empower, develop, motivate the team</div>
+                </td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:6px"><span class="tag tag-accent">Mentoring</span></div>
+                  <div class="skill-source" style="margin-top:4px">Coaching, Empowering Staff, Motivating Staff, Developing Staff</div>
+                </td>
+                <td><span class="relevance relevance-core"><span class="relevance-dot"></span>Core</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:var(--muted)">3</td>
+                <td>
+                  <div class="skill-name">Customer Centricity</div>
+                  <div class="skill-desc">Doppia valenza: verso clienti e collaboratori</div>
+                </td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:6px"><span class="tag tag-accent">Focusing on Others</span></div>
+                  <div class="skill-source" style="margin-top:4px">Understanding Others, Supporting Others</div>
+                </td>
+                <td><span class="relevance relevance-core"><span class="relevance-dot"></span>Core</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:var(--muted)">4</td>
+                <td>
+                  <div class="skill-name">Relazione + Clienteling</div>
+                  <div class="skill-desc">Relazioni multi-livello: clienti, colleghi, HQ</div>
+                </td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:6px"><span class="tag tag-accent">Building Relations</span></div>
+                  <div class="skill-source" style="margin-top:4px">Building Relationship, Developing Network, Relating Across Levels</div>
+                </td>
+                <td><span class="relevance relevance-core"><span class="relevance-dot"></span>Core</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:var(--muted)">5</td>
+                <td>
+                  <div class="skill-name">Comunicazione + Influenza</div>
+                  <div class="skill-desc">Ispirare il team con autorevolezza</div>
+                </td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:6px"><span class="tag tag-accent">Presenting</span></div>
+                  <div class="skill-source" style="margin-top:4px">Projecting Credibility, Responding to Audience</div>
+                </td>
+                <td><span class="relevance relevance-core"><span class="relevance-dot"></span>Core</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:var(--muted)">6</td>
+                <td>
+                  <div class="skill-name">Performance commerciale</div>
+                  <div class="skill-desc">Garantire standard e target attraverso il team</div>
+                </td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:6px"><span class="tag tag-accent">Delivering Result</span></div>
+                  <div class="skill-source" style="margin-top:4px">Working Systematically, Setting Quality Standards</div>
+                </td>
+                <td><span class="relevance relevance-core"><span class="relevance-dot"></span>Core</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:var(--muted)">7</td>
+                <td>
+                  <div class="skill-name">Pianificazione + Risorse</div>
+                  <div class="skill-desc">Organizzazione team, stock, turni, VM</div>
+                </td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:6px"><span class="tag tag-accent">Organizing & Planning</span></div>
+                  <div class="skill-source" style="margin-top:4px">Setting Objectives, Managing Resources, Managing Time</div>
+                </td>
+                <td><span class="relevance relevance-core"><span class="relevance-dot"></span>Core</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:var(--muted)">8</td>
+                <td>
+                  <div class="skill-name">Execution strategica</div>
+                  <div class="skill-desc">Trasformare strategia in azione concreta</div>
+                </td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:6px"><span class="tag tag-accent">Taking Action</span></div>
+                  <div class="skill-source" style="margin-top:4px">Executing Plans, Acting with Confidence, Acting on Own Initiative</div>
+                </td>
+                <td><span class="relevance relevance-alta"><span class="relevance-dot"></span>Alta</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:var(--muted)">9</td>
+                <td>
+                  <div class="skill-name">Empatia + Integrità</div>
+                  <div class="skill-desc">Leadership emotiva, gestione conflitti</div>
+                </td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:6px"><span class="tag tag-accent">Emotional Intelligence</span></div>
+                  <div class="skill-source" style="margin-top:4px">Showing Empathy, Stabilizing Emotion, Managing Conflict</div>
+                </td>
+                <td><span class="relevance relevance-alta"><span class="relevance-dot"></span>Alta</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:var(--muted)">10</td>
+                <td>
+                  <div class="skill-name">Sperimentazione + Adattabilità</div>
+                  <div class="skill-desc">Multi-mercato IT/ES/UK, gestione ambiguità</div>
+                </td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:6px"><span class="tag tag-accent">Cognitive Flexibility</span></div>
+                  <div class="skill-source" style="margin-top:4px">Adapting Situations, Cultural Awareness, Managing Ambiguity</div>
+                </td>
+                <td><span class="relevance relevance-alta"><span class="relevance-dot"></span>Alta</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:var(--muted)">11</td>
+                <td>
+                  <div class="skill-name">Entrepreneurship + Innovazione</div>
+                  <div class="skill-desc">Coraggio di innovare e proporre cambiamenti</div>
+                </td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:6px"><span class="tag tag-accent">Creating</span></div>
+                  <div class="skill-source" style="margin-top:4px">Introducing Change, Developing Novel Solutions, Thinking Unconventionally</div>
+                </td>
+                <td><span class="relevance relevance-alta"><span class="relevance-dot"></span>Alta</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;color:var(--muted)">12</td>
+                <td>
+                  <div class="skill-name">Resilienza + Pressione</div>
+                  <div class="skill-desc">Responsabilità sui risultati del team intero</div>
+                </td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:6px"><span class="tag tag-accent">Resilience</span></div>
+                  <div class="skill-source" style="margin-top:4px">Coping with Pressure, Maintaining Positivity</div>
+                </td>
+                <td><span class="relevance relevance-alta"><span class="relevance-dot"></span>Alta</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TL EXTRAS -->
+      <div class="card" style="margin-top:20px">
+        <div class="card-title" style="margin-bottom:12px">Competenze aggiuntive rispetto al Client Advisor</div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <div style="flex:1;min-width:220px;padding:12px;background:var(--primary-light);border-radius:var(--radius-md);border-left:3px solid var(--primary)">
+            <div style="font-size:13px;font-weight:600;color:var(--text)">Formazione & Empowerment</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px">Esperienza in formazione, empowerment e motivazione del team</div>
+          </div>
+          <div style="flex:1;min-width:220px;padding:12px;background:var(--primary-light);border-radius:var(--radius-md);border-left:3px solid var(--primary)">
+            <div style="font-size:13px;font-weight:600;color:var(--text)">Coaching & Mentoring</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px">Capacità di coaching e mentoring dei collaboratori</div>
+          </div>
+          <div style="flex:1;min-width:220px;padding:12px;background:var(--primary-light);border-radius:var(--radius-md);border-left:3px solid var(--primary)">
+            <div style="font-size:13px;font-weight:600;color:var(--text)">People Management</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px">Competenze di leadership e gestione delle persone</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cross-links">
+      <button class="cross-link" onclick="navigateTo('clientadvisor')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>Client Advisor</button>
+      <button class="cross-link" onclick="navigateTo('comparison')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>Confronto Ruoli</button>
+    </div>
+  </div>
+
+  <!-- COMPARISON -->
+  <div id="section-comparison" style="display:none">
+    <div class="section animate">
+      <div class="section-title">Confronto Skill — Client Advisor vs Team Leader</div>
+      <div class="section-sub">Mapping delle skill condivise e specifiche per ruolo</div>
+
+      <div class="card" style="padding:0;overflow:hidden">
+        <div class="comparison-header">
+          <span>Skill Skillvue</span>
+          <span style="text-align:center">Client Advisor</span>
+          <span style="text-align:center">Team Leader</span>
+        </div>
+        <div id="comparison-body"></div>
+      </div>
+
+      <!-- SUMMARY -->
+      <div class="grid-2" style="margin-top:20px">
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px">Client Advisor — Distribuzione</div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+            <span style="font-size:12px;font-weight:500;color:var(--danger-text);width:50px">Core</span>
+            <div class="progress-bar" style="flex:1"><div class="progress-fill" style="width:55.5%;background:#DC2626"></div></div>
+            <span style="font-size:12px;font-weight:600;color:var(--text)">5</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="font-size:12px;font-weight:500;color:var(--warning-text);width:50px">Alta</span>
+            <div class="progress-bar" style="flex:1"><div class="progress-fill" style="width:44.5%;background:#F59E0B"></div></div>
+            <span style="font-size:12px;font-weight:600;color:var(--text)">4</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px">Team Leader — Distribuzione</div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+            <span style="font-size:12px;font-weight:500;color:var(--danger-text);width:50px">Core</span>
+            <div class="progress-bar" style="flex:1"><div class="progress-fill" style="width:58.3%;background:#DC2626"></div></div>
+            <span style="font-size:12px;font-weight:600;color:var(--text)">7</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="font-size:12px;font-weight:500;color:var(--warning-text);width:50px">Alta</span>
+            <div class="progress-bar" style="flex:1"><div class="progress-fill" style="width:41.7%;background:#F59E0B"></div></div>
+            <span style="font-size:12px;font-weight:600;color:var(--text)">5</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cross-links">
+      <button class="cross-link" onclick="navigateTo('clientadvisor')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>Client Advisor</button>
+      <button class="cross-link" onclick="navigateTo('teamleader')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>Team Leader</button>
+      <button class="cross-link" onclick="navigateTo('overview')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>Overview</button>
+    </div>
+  </div>
+
+
+
+</main>
+
+<script>
+// Comparison data
+const skills = [
+  { name:'Focusing on Others', ca:true, caRel:'Core', tl:true, tlRel:'Core' },
+  { name:'Building Relations', ca:true, caRel:'Core', tl:true, tlRel:'Core' },
+  { name:'Presenting', ca:true, caRel:'Core', tl:true, tlRel:'Core' },
+  { name:'Delivering Result', ca:true, caRel:'Core', tl:true, tlRel:'Core' },
+  { name:'Emotional Intelligence', ca:true, caRel:'Core', tl:true, tlRel:'Alta' },
+  { name:'Taking Action', ca:true, caRel:'Alta', tl:true, tlRel:'Alta' },
+  { name:'Resilience', ca:true, caRel:'Alta', tl:true, tlRel:'Alta' },
+  { name:'Teamwork', ca:true, caRel:'Alta', tl:false, tlRel:'' },
+  { name:'Learning Plasticity', ca:true, caRel:'Alta', tl:false, tlRel:'' },
+  { name:'Leading', ca:false, caRel:'', tl:true, tlRel:'Core' },
+  { name:'Mentoring', ca:false, caRel:'', tl:true, tlRel:'Core' },
+  { name:'Organizing & Planning', ca:false, caRel:'', tl:true, tlRel:'Core' },
+  { name:'Cognitive Flexibility', ca:false, caRel:'', tl:true, tlRel:'Alta' },
+  { name:'Creating', ca:false, caRel:'', tl:true, tlRel:'Alta' },
+];
+
+const compBody = document.getElementById('comparison-body');
+skills.forEach(s => {
+  const row = document.createElement('div');
+  row.className = 'comparison-row';
+  const checkSvg = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+  const xSvg = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+  row.innerHTML = `
+    <div class="comp-skill">${s.name}</div>
+    <div class="comp-cell" style="text-align:center;display:flex;align-items:center;justify-content:center;gap:6px">
+      <span class="check-icon ${s.ca?'check-yes':'check-no'}">${s.ca?checkSvg:xSvg}</span>
+      ${s.caRel?`<span style="font-size:11px;font-weight:500;color:${s.caRel==='Core'?'var(--danger-text)':'var(--warning-text)'}">${s.caRel}</span>`:''}
+    </div>
+    <div class="comp-cell" style="text-align:center;display:flex;align-items:center;justify-content:center;gap:6px">
+      <span class="check-icon ${s.tl?'check-yes':'check-no'}">${s.tl?checkSvg:xSvg}</span>
+      ${s.tlRel?`<span style="font-size:11px;font-weight:500;color:${s.tlRel==='Core'?'var(--danger-text)':'var(--warning-text)'}">${s.tlRel}</span>`:''}
+    </div>
+  `;
+  compBody.appendChild(row);
+});
+
+// Navigation
+const sectionMap = ['overview','values','competences','clientadvisor','teamleader','comparison'];
+
+function showSection(id) {
+  document.querySelectorAll('[id^="section-"]').forEach(el => el.style.display = 'none');
+  document.getElementById('section-' + id).style.display = 'block';
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function navigateTo(id) {
+  document.querySelectorAll('[id^="section-"]').forEach(el => el.style.display = 'none');
+  document.getElementById('section-' + id).style.display = 'block';
+  const idx = sectionMap.indexOf(id);
+  document.querySelectorAll('.nav-item').forEach((el,i) => {
+    el.classList.toggle('active', i === idx);
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>
